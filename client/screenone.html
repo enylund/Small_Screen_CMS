@@ -24,8 +24,10 @@
           $(document).ready(function() {
 
           socket.on('bdInfo', function(data) {
+            if(data.screen == 1 && data.active == 1) {
               $("#iframe").append("<iframe src='http://"+data.siteurl+ "'></iframe>");
-          });
+            }
+            });
 
           });
 
@@ -36,7 +38,7 @@
 
         <!-- Add your site or application content here -->
 
-        <div id="iframe"><iframe src='http://www.w3schools.com/'></div>
+        <div id="iframe"></div>
 		
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
