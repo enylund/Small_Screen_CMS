@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Add Content</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <script src="/socket.io/socket.io.js"></script>
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+    <script type="text/javascript">
+
+          var socket = io.connect(window.location.hostname);
+
+          socket.on('bdInfo', function(data) {
+            console.log(data._id);
+            if(data.screen == 1 && data.active == 1) {
+              $("#dbInfoOne").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+            }else if(data.screen == 2 && data.active == 1) {
+              $("#dbInfoTwo").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+            }else if(data.screen == 3 && data.active == 1) {
+              $("#dbInfoThree").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+            }
+            });
+
+          $(document).ready(function() {
+
+            $( "#addScreenOne" ).click(function() {
+              var urlVal = $("#urlValScreenOne").val();
+              var timeVal = $("#timeValScreenOne").val();
+
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:1 });
+              window.location.reload();
+            });
+
+            $( "#addScreenTwo" ).click(function() {
+              var urlVal = $("#urlValScreenTwo").val();
+              var timeVal = $("#timeValScreenTwo").val();
+
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:2 });
+              window.location.reload();
+            });
+
+            $( "#addScreenThree" ).click(function() {
+              var urlVal = $("#urlValScreenThree").val();
+              var timeVal = $("#timeValScreenThree").val();
+
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:3 });
+              window.location.reload();
+            });
+
+            $("#removeScreenOne").click(function() {
+              var idScreenOne = $("#idScreenOne").val();
+
+              var updateinfo = { idToUpdate: idScreenOne, screen: 1 };
+
+              socket.emit('updatedb', updateinfo);
+              window.location.reload();
+
+            });
+
+            $("#removeScreenTwo").click(function() {
+                var idScreenOne = $("#idScreenTwo").val();
+
+                var updateinfo = { idToUpdate: idScreenOne, screen: 2 };
+
+                socket.emit('updatedbTwo', updateinfo);
+                window.location.reload();
+
+            });
+
+            $("#removeScreenThree").click(function() {
+                var idScreenOne = $("#idScreenThree").val();
+
+                var updateinfo = { idToUpdate: idScreenOne, screen: 3 };
+
+                socket.emit('updatedbThree', updateinfo);
+                window.location.reload();
+
+            });
+
+
+
+
+
+
+          });
+
+    </script>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+
+        <div>SCREEN 1</div>
+        <table id="dbInfoOne" border="1" style="width:25%">
+          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+
+        </table>
+
+        Add URL: <input type="text" id="urlValScreenOne"/>
+        Add Time: <input type="text" id="timeValScreenOne"/>
+        <button id="addScreenOne">add</button>
+        <br />
+        Remove With URL: <input type="text" id="idScreenOne"/>
+        <button id="removeScreenOne">Remove</button>
+
+        <br />
+        <br />
+        <br />
+
+        <div>SCREEN 2</div>
+        <table id="dbInfoTwo" border="1" style="width:25%">
+          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+
+        </table>
+
+        Add URL: <input type="text" id="urlValScreenTwo"/>
+        Add Time: <input type="text" id="timeValScreenTwo"/>
+        <button id="addScreenTwo">add</button>
+        <br />
+        Remove With URL: <input type="text" id="idScreenTwo"/>
+        <button id="removeScreenTwo">Remove</button>
+
+
+        <br />
+        <br />
+        <br />
+
+        <div>SCREEN 3</div>
+        <table id="dbInfoThree" border="1" style="width:25%">
+          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+
+        </table>
+
+        Add URL: <input type="text" id="urlValScreenThree"/>
+        Add Time: <input type="text" id="timeValScreenThree"/>
+        <button id="addScreenThree">add</button>
+        <br />
+        Remove With URL: <input type="text" id="idScreenThree"/>
+        <button id="removeScreenThree">Remove</button>
+
+
+
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X');ga('send','pageview');
+        </script>
+    </body>
+</html>
