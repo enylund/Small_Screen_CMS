@@ -19,40 +19,43 @@
 
           var socket = io.connect(window.location.hostname);
 
-          socket.on('bdInfo', function(data) {
-            console.log(data._id);
+          $(document).ready(function() {
+
+            socket.on('bdInfo', function(data) {
+            
             if(data.screen == 1 && data.active == 1) {
-              $("#dbInfoOne").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+              $("#dbInfoOne").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
             }else if(data.screen == 2 && data.active == 1) {
-              $("#dbInfoTwo").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+              $("#dbInfoTwo").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
             }else if(data.screen == 3 && data.active == 1) {
-              $("#dbInfoThree").append("<tr><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td>"+data.active+"</td></tr>");
+              $("#dbInfoThree").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
             }
             });
-
-          $(document).ready(function() {
 
             $( "#addScreenOne" ).click(function() {
               var urlVal = $("#urlValScreenOne").val();
               var timeVal = $("#timeValScreenOne").val();
+              var positionVal = $("#positionValScreenOne").val();
 
-              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:1 });
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:1, positionVal: positionVal });
               window.location.reload();
             });
 
             $( "#addScreenTwo" ).click(function() {
               var urlVal = $("#urlValScreenTwo").val();
               var timeVal = $("#timeValScreenTwo").val();
+              var positionVal = $("#positionValScreenTwo").val();
 
-              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:2 });
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:2, positionVal: positionVal });
               window.location.reload();
             });
 
             $( "#addScreenThree" ).click(function() {
               var urlVal = $("#urlValScreenThree").val();
               var timeVal = $("#timeValScreenThree").val();
+              var positionVal = $("#positionValScreenThree").val();
 
-              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:3 });
+              socket.emit('addtodb', { siteurl: urlVal, timeval: timeVal, screen:3, positionVal: positionVal });
               window.location.reload();
             });
 
@@ -71,7 +74,7 @@
 
                 var updateinfo = { idToUpdate: idScreenOne, screen: 2 };
 
-                socket.emit('updatedbTwo', updateinfo);
+                socket.emit('updatedb', updateinfo);
                 window.location.reload();
 
             });
@@ -81,15 +84,15 @@
 
                 var updateinfo = { idToUpdate: idScreenOne, screen: 3 };
 
-                socket.emit('updatedbThree', updateinfo);
+                socket.emit('updatedb', updateinfo);
                 window.location.reload();
 
             });
 
-
-
-
-
+			$("#syncScreens").click(function() {
+				socket.emit('syncRequest');
+				console.log("trying to emit");
+			});
 
           });
 
@@ -102,12 +105,13 @@
 
         <div>SCREEN 1</div>
         <table id="dbInfoOne" border="1" style="width:25%">
-          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
 
         </table>
 
         Add URL: <input type="text" id="urlValScreenOne"/>
         Add Time: <input type="text" id="timeValScreenOne"/>
+        Add Position: <input type="text" id="positionValScreenOne"/>
         <button id="addScreenOne">add</button>
         <br />
         Remove With URL: <input type="text" id="idScreenOne"/>
@@ -119,12 +123,13 @@
 
         <div>SCREEN 2</div>
         <table id="dbInfoTwo" border="1" style="width:25%">
-          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
 
         </table>
 
         Add URL: <input type="text" id="urlValScreenTwo"/>
         Add Time: <input type="text" id="timeValScreenTwo"/>
+        Add Position: <input type="text" id="positionValScreenTwo"/>
         <button id="addScreenTwo">add</button>
         <br />
         Remove With URL: <input type="text" id="idScreenTwo"/>
@@ -137,19 +142,23 @@
 
         <div>SCREEN 3</div>
         <table id="dbInfoThree" border="1" style="width:25%">
-          <tr><td>URL</td><td>TIME</td><td>ACTIVE</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
 
         </table>
 
         Add URL: <input type="text" id="urlValScreenThree"/>
         Add Time: <input type="text" id="timeValScreenThree"/>
+        Add Position: <input type="text" id="positionValScreenThree"/>
         <button id="addScreenThree">add</button>
         <br />
         Remove With URL: <input type="text" id="idScreenThree"/>
         <button id="removeScreenThree">Remove</button>
 
+		<br />
+	    <br />
+	    <br />
 
-
+		<button id="syncScreens">Sync Screens</button>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>

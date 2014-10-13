@@ -18,16 +18,41 @@
     <script type="text/javascript">
 
           var socket = io.connect(window.location.hostname);
-		  var fromDB = [];
-		
+		      var fromDB = [];
 
           $(document).ready(function() {
 
-          socket.on('bdInfo', function(data) {
-            if(data.screen == 3 && data.active == 1) {
-              $("#iframe").append("<iframe src='http://"+data.siteurl+ "'></iframe>");
-            }
+            var requestingScreen = 3;
+
+            socket.emit('connected', requestingScreen);
+
+            socket.on('siteRotate3', function(data) {
+	
+	                //create time offset for setTimeouts 
+	                //to emit at the right moment
+	                var offset = parseInt(data[0].timeval) * 1000;
+					console.log(offset);
+
+	                data.forEach(function(document) {
+
+	                    var timeadd = parseInt(document.timeval) * 1000;
+
+	                    setTimeout(function(){
+	                        if(document.siteurl != "blank") {
+				            	console.log(document.siteurl);
+				            	$("#iframe").html("<iframe src='"+document.siteurl+"'</iframe>");
+				            }
+	                    }, offset);
+	                    offset += timeadd;
+	                    console.log(offset);
+	                });
+	            
+            
             });
+
+			socket.on('syncUpScreens', function(){
+				location.reload();
+			});
 
           });
 
