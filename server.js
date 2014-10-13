@@ -29,6 +29,8 @@ var sites = db.collection('listofurls');
 
 url_room.on('connection', function(socket) {
 	
+ 	//Emit page refesh to small screens. 
+	//Used to sync them up.
 	socket.on('syncRequest', function(data){
 		socket.broadcast.emit('syncUpScreens');
 		console.log("message recieved");
@@ -37,9 +39,11 @@ url_room.on('connection', function(socket) {
       //Execute the below function to send student site urls to screen display pages
       socket.on('connected', function(data) {
 
-          //set the data from the client that tells which screens info is needed
+          //set data from client that tells which screens DB info is needed
           //query database for active urls
           var screenThatsRequesting = data;
+
+		  //Query DB for urls to display
           var queryScreen = sites.find(  { $and: [ { screen: screenThatsRequesting }, { active: 1 } ] }, {siteurl:1, timeval:1}).sort({positionVal: 1});
 		  var screenToEmitTo = "siteRotate"+screenThatsRequesting;
             //iterate over db query to send to screens
@@ -91,7 +95,8 @@ url_room.on('connection', function(socket) {
               screen: data.screen,
               positionVal: data.positionVal
            };
-
+			
+		   //Insert new urls into DB
            sites.insert(newDoc, function(err, inserted) {
               if (err) throw err;
             });
