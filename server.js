@@ -26,43 +26,92 @@ MongoClient.connect('mongodb://mobilecomputing:asdf1234@ds043210.mongolab.com:43
 // create a shortcut to the collection
 var sites = db.collection('listofurls');
 
+function sendDocumentToScreen(socket, screenNum, cursor) {
+
+    // If no cursor is passed, create one by doing a find
+    if (cursor == undefined) {
+        console.log("Finding documents for screen", screenNum);
+        cursor = sites.find(
+            {
+                $and: [
+                    {screen: screenNum},
+                    {active: 1}
+                ]
+            },
+            {
+                siteurl: 1,
+                timeval: 1
+            }
+        ).sort({positionVal: 1});
+    }
+
+    // See if there's a next document in the collection
+    cursor.nextObject(function(err, document) {
+        if (err) throw err;
+
+        // If so, get it
+        if (document) {
+            console.log("Sending document to screen", screenNum, document.siteurl);
+
+            // Send it to this screen
+            socket.emit('showUrl', document);
+
+            // And get the next one after the appropriate time
+            setTimeout(function() {
+                sendDocumentToScreen(socket, screenNum, cursor);
+            }, (document.siteurl == 'blank') ? 0 : (document.timeval * 1000));
+
+        }
+
+        // If not, reset the cursor to the beginning by doing another find.
+        else {
+            console.log("Looping screen", screenNum);
+
+            // As a special case, if there are no documents in the collection, wait a second before doing another find.
+            // Otherwise there would be no delay at all, and we'd blast Mongodb with infinite queries.
+            cursor.count(function(err, count) {
+                if (err) throw err;
+                setTimeout(function () {
+                    sendDocumentToScreen(socket, screenNum);
+                }, (count == 0) ? 1000 : 0)
+            });
+
+        }
+
+    });
+
+}
 
 url_room.on('connection', function(socket) {
 	
- 	//Emit page refesh to small screens. 
+ 	//Emit page refesh to small screens.
 	//Used to sync them up.
 	socket.on('syncRequest', function(data){
 		socket.broadcast.emit('syncUpScreens');
 		console.log("message recieved");
 	});
 
-      //Execute the below function to send student site urls to screen display pages
+    //initial database query for use on the index page of CMS
+    sites.find().sort( { positionVal: 1 } ).each(function(err, message) {
+        if (message != null) {
+
+            //Emit information to build the Index Page
+            if( message.siteurl != 'blank' ) {
+                socket.emit('bdInfo', message);
+            }
+        }
+    });
+
+
+      // Screen sends this message when it first connects
+      // data should be the screen number (1, 2, or 3)
       socket.on('connected', function(data) {
 
-          //set data from client that tells which screens DB info is needed
-          //query database for active urls
-          var screenThatsRequesting = data;
+          console.log("Screen connected", data);
 
-		  //Query DB for urls to display
-          var queryScreen = sites.find(  { $and: [ { screen: screenThatsRequesting }, { active: 1 } ] }, {siteurl:1, timeval:1}).sort({positionVal: 1});
-		  var screenToEmitTo = "siteRotate"+screenThatsRequesting;
-            //iterate over db query to send to screens
-            queryScreen.toArray(function(err, documents) {
+          // Start recursing!
+          sendDocumentToScreen(socket, data);
 
-                socket.emit(screenToEmitTo, documents);
-
-            });
-      });
-
-      //initial database query for use on the index page of CMS
-      sites.find().sort( { positionVal: 1 } ).each(function(err, message) {
-          if (message != null) {
-
-              //Emit information to build the Index Page
-              if( message.siteurl != 'blank' ) {
-              socket.emit('bdInfo', message);
-              }
-          }
       });
 
       //receives index page database additions

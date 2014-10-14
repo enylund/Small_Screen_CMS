@@ -18,7 +18,6 @@
     <script type="text/javascript">
 
           var socket = io.connect(window.location.hostname);
-		      var fromDB = [];
 
           $(document).ready(function() {
 
@@ -26,31 +25,16 @@
 
             socket.emit('connected', requestingScreen);
 
-            socket.on('siteRotate3', function(data) {
-	
-	                //create time offset for setTimeouts 
-	                //to emit at the right moment
-	                var offset = parseInt(data[0].timeval) * 1000;
-					console.log(offset);
+              socket.on('showUrl', function(data) {
+                  console.log('showUrl', data);
+                  if (data.siteurl != 'blank') {
+                      $("#iframe").html("<iframe src='" + data.siteurl + "'</iframe>");
+                  }
 
-	                data.forEach(function(document) {
-
-	                    var timeadd = parseInt(document.timeval) * 1000;
-
-	                    setTimeout(function(){
-	                        if(document.siteurl != "blank") {
-				            	console.log(document.siteurl);
-				            	$("#iframe").html("<iframe src='"+document.siteurl+"'</iframe>");
-				            }
-	                    }, offset);
-	                    offset += timeadd;
-	                    console.log(offset);
-	                });
-	            
-            
-            });
+              });
 
 			socket.on('syncUpScreens', function(){
+                console.log('syncUpScreens');
 				location.reload();
 			});
 
