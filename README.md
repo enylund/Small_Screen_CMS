@@ -1,10 +1,11 @@
-Tiny screen CMS for Mobile Computing!
+## Tiny screen CMS for Mobile Computing!
 
 http://whispering-anchorage-6156.herokuapp.com/
 
 Or run locally (node server.js) and go to localhost:5000
 
-Go to `/index.html` for the CMS
+Go to `/index.html` for the CMS  
+
 Go to `/screenone.html` `/screentwo.html` `/screenthree.html` for the screens 
 
 TODO: Handle disconnections. Otherwise we keep sending messages to disconnected clients forever.
