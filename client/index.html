@@ -23,16 +23,14 @@
 
             socket.on('bdInfo', function(data) {
               if(data.active == 1){
-              console.log(data.siteurl);
-              console.log(data._id);
               }
 
             if(data.screen == 1 && data.active == 1) {
-              $("#dbInfoOne").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
+              $("#dbInfoOne").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td><button class='removeThis' data-id='"+data._id+"'>-</button></td></tr>");
             }else if(data.screen == 2 && data.active == 1) {
-              $("#dbInfoTwo").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
+              $("#dbInfoTwo").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td><button class='removeThis' data-id='"+data._id+"'>-</button></td></tr>");
             }else if(data.screen == 3 && data.active == 1) {
-              $("#dbInfoThree").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
+              $("#dbInfoThree").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td><td><button class='removeThis' data-id='"+data._id+"'>-</button></td></tr>");
             }
             });
 
@@ -63,40 +61,17 @@
               window.location.reload();
             });
 
-            $("#removeScreenOne").click(function() {
-              var idScreenOne = $("#idScreenOne").val();
+            $("body").on("click", ".removeThis", function() {
+              console.log("got here");
+              var idScreenOne = $(this).attr("data-id");
+              console.log(idScreenOne);
 
-              var updateinfo = { idToUpdate: idScreenOne, screen: 1 };
+              var updateinfo = { idToUpdate: idScreenOne };
 
               socket.emit('updatedb', updateinfo);
               window.location.reload();
 
             });
-
-            $("#removeScreenTwo").click(function() {
-                var idScreenOne = $("#idScreenTwo").val();
-
-                var updateinfo = { idToUpdate: idScreenOne, screen: 2 };
-
-                socket.emit('updatedb', updateinfo);
-                window.location.reload();
-
-            });
-
-            $("#removeScreenThree").click(function() {
-                var idScreenOne = $("#idScreenThree").val();
-
-                var updateinfo = { idToUpdate: idScreenOne, screen: 3 };
-
-                socket.emit('updatedb', updateinfo);
-                window.location.reload();
-
-            });
-
-			$("#syncScreens").click(function() {
-				socket.emit('syncRequest');
-				console.log("trying to emit");
-			});
 
           });
 
@@ -109,7 +84,7 @@
 
         <div>SCREEN 1</div>
         <table id="dbInfoOne" border="1" style="width:25%">
-          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td><td>REMOVE</td></tr>
 
         </table>
 
@@ -118,16 +93,13 @@
         Add Position: <input type="text" id="positionValScreenOne"/>
         <button id="addScreenOne">add</button>
         <br />
-        Remove With URL: <input type="text" id="idScreenOne"/>
-        <button id="removeScreenOne">Remove</button>
-
         <br />
         <br />
         <br />
 
         <div>SCREEN 2</div>
         <table id="dbInfoTwo" border="1" style="width:25%">
-          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td><td>REMOVE</td></tr>
 
         </table>
 
@@ -136,17 +108,13 @@
         Add Position: <input type="text" id="positionValScreenTwo"/>
         <button id="addScreenTwo">add</button>
         <br />
-        Remove With URL: <input type="text" id="idScreenTwo"/>
-        <button id="removeScreenTwo">Remove</button>
-
-
         <br />
         <br />
         <br />
 
         <div>SCREEN 3</div>
         <table id="dbInfoThree" border="1" style="width:25%">
-          <tr><td>ORDER</td><td>URL</td><td>TIME</td></tr>
+          <tr><td>ORDER</td><td>URL</td><td>TIME</td><td>REMOVE</td></tr>
 
         </table>
 
@@ -155,9 +123,6 @@
         Add Position: <input type="text" id="positionValScreenThree"/>
         <button id="addScreenThree">add</button>
         <br />
-        Remove With URL: <input type="text" id="idScreenThree"/>
-        <button id="removeScreenThree">Remove</button>
-
 		<br />
 	    <br />
 	    <br />

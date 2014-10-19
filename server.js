@@ -7,6 +7,7 @@ var async = require('async');
 
 var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 
 
 // Configure the Express web server
@@ -145,14 +146,14 @@ url_room.on('connection', function(socket) {
                         if(err || !update) console.log("User not updated");
                         else {
                          console.log("user updated");
-sites.insert(newDoc, function(err, inserted) {
+                         sites.insert(newDoc, function(err, inserted) {
                             if (err) throw err;
                     });
                         }
                     });
                    }
                 }
-           
+
            if (message == null) {
                  callback(null, 'one');
            }});
@@ -177,10 +178,10 @@ sites.insert(newDoc, function(err, inserted) {
        //Updates the DB when user removes a url from the queue
        socket.on('updatedb', function(data) {
 
-          var theSite = data.idToUpdate;
-          var theScreen = data.screen;
+          var theSite = ObjectId(data.idToUpdate);
+          console.log(theSite);
 
-          sites.update({ $and: [ {siteurl: theSite},{screen: theScreen}]}, {$set: {active: 2}}, { multi: true }, function(err, updated) {
+          sites.update({ _id: theSite }, {$set: {active: 2}}, { multi: true }, function(err, updated) {
                 if( err || !updated ) console.log("User not updated");
                   else console.log("User updated");
           });
