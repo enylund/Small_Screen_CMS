@@ -17,3 +17,5 @@ TODO: Use just one client html file `screen.html`, with a query parameter or a h
 TODO: See if just altering the `iframe src`, rather than replacing the entire `<iframe>`, would look any smoother. 
  
 TODO: Fix the bug with inserting positions
+
+TODO: Create easier deletion system
