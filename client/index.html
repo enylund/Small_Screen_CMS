@@ -22,7 +22,11 @@
           $(document).ready(function() {
 
             socket.on('bdInfo', function(data) {
-            
+              if(data.active == 1){
+              console.log(data.siteurl);
+              console.log(data._id);
+              }
+
             if(data.screen == 1 && data.active == 1) {
               $("#dbInfoOne").append("<tr><td>"+data.positionVal+"</td><td>"+data.siteurl+ "</td><td>"+data.timeval+"</td></tr>");
             }else if(data.screen == 2 && data.active == 1) {

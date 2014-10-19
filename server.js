@@ -2,6 +2,8 @@ var http = require('http');
 var path = require('path');
 var request = require('request');
 var io = require('socket.io');
+var async = require('async');
+
 
 var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
@@ -117,38 +119,59 @@ url_room.on('connection', function(socket) {
       //receives index page database additions
       socket.on('addtodb', function(data) {
 
-          //variable holds requested url position in scheduler queue
-          var positionMarker = data.positionVal;
-
-          sites.find({ active: 1 }).sort( { positionVal: 1 }).each(function(err, message) {
-              if (message != null) {
-                  if ( message.positionVal == positionMarker ) {
-                      console.log("duplicate reached");
-                      var positionMarkerNum = parseInt(positionMarker);
-                      console.log(positionMarkerNum);
-
-                      //This should update the whole queue. NOT WORKING
-                      sites.update({positionVal: {$gte: positionMarkerNum} }, { $inc: { positionVal: 1 }}, { multi: true}, function(err, updated) {
-                          if( err || !updated ) console.log("User not updated");
-                          else console.log("User updated");
-                      }); 
-                   }
-                }
-           });
-
            //Build database addition json
            var newDoc = {
               siteurl: data.siteurl,
               timeval: data.timeval,
               active: 1,
               screen: data.screen,
-              positionVal: data.positionVal
+              positionVal: parseInt(data.positionVal)
            };
+
+           var preventor = 1;
+
+
+           async.series([
+              function(callback){
+                 sites.find({ active: 1, screen: newDoc.screen }).sort( { positionVal: 1 }).each(function(err, message) {
+                  if (message != null) {
+                  if ( message.positionVal == newDoc.positionVal ) {
+                      console.log("duplicate reached");
+                      var positionMarkerNum = parseInt(newDoc.positionVal);
+                      console.log(positionMarkerNum);
+                      preventor = 2;
+
+                      sites.update({active: 1, screen: newDoc.screen, positionVal: {$gte:positionMarkerNum}}, { $inc: {positionVal: 1}}, {multi:true}, function(err, update) {
+                        if(err || !update) console.log("User not updated");
+                        else {
+                         console.log("user updated");
+sites.insert(newDoc, function(err, inserted) {
+                            if (err) throw err;
+                    });
+                        }
+                    });
+                   }
+                }
+           
+           if (message == null) {
+                 callback(null, 'one');
+           }});
+                           },
+              function(callback){
+                if (preventor == 1) {
+                    sites.insert(newDoc, function(err, inserted) {
+                            if (err) throw err;
+                    });
+                }
+
+                 callback(null, 'two');
+                 }
+                 ],
+              // optional callback
+               function(err, results){
+               // results is now equal to ['one', 'two']
+           });
 			
-		   //Insert new urls into DB
-           sites.insert(newDoc, function(err, inserted) {
-              if (err) throw err;
-            });
        });
 
        //Updates the DB when user removes a url from the queue
