@@ -179,11 +179,21 @@ url_room.on('connection', function(socket) {
        socket.on('updatedb', function(data) {
 
           var theSite = ObjectId(data.idToUpdate);
+		  var theRemovedPosition = parseInt(data.removedPosition);
+		  var removedScreenNumber = parseInt(data.removedScreenNumber)
           console.log(theSite);
+		  
 
           sites.update({ _id: theSite }, {$set: {active: 2}}, { multi: true }, function(err, updated) {
                 if( err || !updated ) console.log("User not updated");
-                  else console.log("User updated");
+                  else {
+					console.log("User updated");
+					console.log(theRemovedPosition);
+					sites.update({active: 1, screen: removedScreenNumber, positionVal: {$gte:theRemovedPosition}}, { $inc: {positionVal: -1}}, {multi:true}, function(err, update) {
+                        if(err || !update) console.log(err);
+                        else console.log("user updated");
+                    });
+				}
           });
 
         });
