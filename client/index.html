@@ -75,6 +75,11 @@
 
             });
 
+ 			$( "#syncScreens" ).click(function() {
+				console.log("sync clicked");
+				socket.emit('syncRequest');
+			});
+
           });
 
     </script>
